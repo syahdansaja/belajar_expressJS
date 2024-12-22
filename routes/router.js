@@ -8,9 +8,13 @@ class Router {
         this.initializeRouter();
     }
     initializeRouter () {
+        this.router.post('/auth/register',LoginController.register);
         this.router.post('/auth/login', LoginController.login);
-        this.router.get('/data', UserController.index);
-        this.router.post('/data/post', UserController.create);
+        this.router.get('/auth/haha', async  (req , res) => {
+            res.status(200).json({
+                status: 'success'
+            })
+        })
     }
 }
 export default new Router().router;
