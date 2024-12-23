@@ -1,14 +1,18 @@
+import User from "../Models/User.js";
+import OTPRefresh from "../Models/OTPRefresh.js";
+
 class UserController {
+
   async index(req, res) {
-    res.json({
-      nama: "Muhammad Syahdan Farisqi",
-      kelas: "XII RPL 4",
+    const userData = await User.findOne({
+      where: {
+        email: req.user.email
+      },
+      include: OTPRefresh
     });
+    return res.json(userData);
   }
-  async create(req, res) {
-    res.json({
-        
-    })
-  }
+
 }
+
 export default new UserController();

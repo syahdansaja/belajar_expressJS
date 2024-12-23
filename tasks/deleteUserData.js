@@ -7,7 +7,8 @@ async function deleteUserDataScheduled () {
             where: {
                 otpExpiry: {
                     [Op.lt]: new Date(Date.now())
-                }
+                },
+                otpVerifiedAt: null
             }
         });
 }

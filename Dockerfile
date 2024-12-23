@@ -9,5 +9,5 @@ RUN npm install
 COPY . .
 
 EXPOSE 3000
-
+CMD ["npx","sequelize","db:migrate"]
 CMD ["npm","run","dev"]

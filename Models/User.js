@@ -1,6 +1,7 @@
-import {DataTypes, Model, Sequelize} from "sequelize";
+import {DataTypes, Model} from "sequelize";
 import sequelize from "../config/database.js";
 import bcrypt from "bcryptjs"
+import OTPRefresh from "./OTPRefresh.js";
 
 class User extends Model {}
 User.init({
@@ -84,5 +85,12 @@ User.init({
     }
 });
 // untuk relasi
+User.hasMany(OTPRefresh, {
+    foreignKey: {
+        name: "userId"
+    },
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
 
 export default User;
