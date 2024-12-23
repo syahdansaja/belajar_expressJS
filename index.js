@@ -8,9 +8,9 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import multer from "multer";
-import scheduled from "./tasks/deleteUserData.js";
+import scheduler from "./tasks/indexScheduler.js";
 
-scheduled;
+scheduler;
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);

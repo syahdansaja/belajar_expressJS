@@ -19,7 +19,7 @@ class RegisterController {
 
     upload = multer({ storage: this.storage }).single('avatar');
 
-    sendEmail = async (email, otpPassword) => {
+    static async sendEmail (email, otpPassword) {
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             port: 587,
@@ -47,13 +47,7 @@ class RegisterController {
             `
         }
 
-        transporter.sendMail(mailOptions, function(error, info) {
-            if(error) {
-                console.log(error);
-            } else {
-                console.log('\n Email sent: ' + info.response);
-            }
-        });
+        transporter.sendMail(mailOptions);
     }
 
     register = async (req, res) => {
@@ -98,7 +92,7 @@ class RegisterController {
             const {firstName, lastName, email, password, phoneNumber} = value;
             try {
                 // check is user exist ?
-                const isUserExist = await User.findOne({
+                const isUserExist = User.findOne({
                     where: {
                         email: email,
                     }
@@ -128,7 +122,7 @@ class RegisterController {
                     otpExpiry: otpExpiry
                 });
                 // send OTP password via email for register verification
-                await this.sendEmail(email, otp);
+                await RegisterController.sendEmail(email, otp);
 
                 res.status(201).json({
                     statusCode: 201,
@@ -217,3 +211,6 @@ class RegisterController {
     }
 }
 export default new RegisterController;
+
+const sendEmailFunction = RegisterController.sendEmail;
+export { sendEmailFunction };
