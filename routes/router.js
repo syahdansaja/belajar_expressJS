@@ -1,6 +1,8 @@
 import express from 'express';
-import UserController from "../controllers/UserController.js";
-import LoginController from "../controllers/Auth/LoginController.js";
+import RegisterController from '../controllers/Auth/RegisterController.js';
+import LoginController from '../controllers/Auth/LoginController.js';
+import User from '../Models/User.js';
+import { Op } from 'sequelize';
 
 class Router {
     constructor () {
@@ -8,13 +10,9 @@ class Router {
         this.initializeRouter();
     }
     initializeRouter () {
-        this.router.post('/auth/register',LoginController.register);
+        this.router.post('/auth/register', RegisterController.register);
+        this.router.post('/auth/OTP_Verification', RegisterController.OTPVerification);
         this.router.post('/auth/login', LoginController.login);
-        this.router.get('/auth/haha', async  (req , res) => {
-            res.status(200).json({
-                status: 'success'
-            })
-        })
     }
 }
 export default new Router().router;
