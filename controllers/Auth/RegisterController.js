@@ -4,6 +4,7 @@ import User from "../../Models/User.js";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import {sendEmail} from "../../providers/sendEmail.js";
 
 dotenv.config();
 
@@ -18,37 +19,6 @@ class RegisterController {
     })
 
     upload = multer({ storage: this.storage }).single('avatar');
-
-    static async sendEmail (email, otpPassword) {
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            service: 'gmail',
-            secure: false,
-            auth: {
-                user: process.env.GMAIL_EMAIL,
-                pass: process.env.GMAIL_PASSWORD
-            }
-        });
-
-        const mailOptions = {
-            from: `SYAHDAN DEVELOPER ${process.env.GMAIL_EMAIL}`,
-            to: email,
-            subject: "Your OTP Code",
-            text: `Your OTP Code is ${otpPassword}. This code will expired in 30 minutes`,
-            html: `
-              <p>Dear User</p>
-              <p>Your OTP Code is:</p>
-              <h2 style="color: #2e86de;">${otpPassword}</h2>
-              <p>This code will expired in <strong>30 minutes</strong>. Please do not share ths code with anyone.</p>
-              <br />
-              <p>Regards,</p>
-              <p><strong>Syahdan Developer</strong></p>
-            `
-        }
-
-        transporter.sendMail(mailOptions);
-    }
 
     register = async (req, res) => {
         this.upload(req, res, async (err) => {
@@ -92,23 +62,26 @@ class RegisterController {
             const {firstName, lastName, email, password, phoneNumber} = value;
             try {
                 // check is user exist ?
-                const isUserExist = User.findOne({
+                const isUserExist = await User.findOne({
                     where: {
                         email: email,
                     }
                 });
 
-                if (isUserExist.id) {
-                    res.status(400).json({
-                        statusCode: 400,
+                if (isUserExist) {
+                    res.status(409).json({
+                        statusCode: 409,
                         error: "User already exists",
-                        userExist: isUserExist
+                        userExist: {
+                            name: isUserExist.firstName + isUserExist.lastName,
+                            email: isUserExist.email,
+                        }
                     })
                 }
 
                 // generate OTP for verification
                 const otp = crypto.randomInt(100000, 999999).toString();
-                const otpExpiry = new Date(Date.now() + 30 * 60 * 1000);
+                const otpExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
 
                 const user = await User.create({
                     firstName: firstName,
@@ -121,8 +94,30 @@ class RegisterController {
                     otpPassword: otp,
                     otpExpiry: otpExpiry
                 });
+
                 // send OTP password via email for register verification
-                await RegisterController.sendEmail(email, otp);
+                const mailOptions = {
+                    from: `SYAHDAN DEVELOPER ${process.env.GMAIL_EMAIL}`,
+                    to: email,
+                    subject: "Your OTP Code",
+                    text: `Your OTP Code is ${user.email}. This code will expired in 30 minutes`,
+                    html: `
+                    <p>Dear User</p>
+                    <p>Your OTP Code is:</p>
+                    <h2 style="color: #2e86de;">${user.otpPassword}</h2>
+                    <p>This code will expire in <strong>30 minutes</strong>. Please do not share ths code with anyone.</p>
+                    <br />
+                    <p>Regards,</p>
+                    <p><strong>Syahdan Developer</strong></p>
+                    `
+                }
+                const resultSendEmail = await sendEmail(mailOptions);
+                if (!resultSendEmail) {
+                    res.status(500).json({
+                        statusCode: 500,
+                        error: "Failed to send email",
+                    })
+                }
 
                 res.status(201).json({
                     statusCode: 201,
@@ -211,6 +206,3 @@ class RegisterController {
     }
 }
 export default new RegisterController;
-
-const sendEmailFunction = RegisterController.sendEmail;
-export { sendEmailFunction };

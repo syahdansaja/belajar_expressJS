@@ -84,13 +84,5 @@ User.init({
         }
     }
 });
-// untuk relasi
-User.hasMany(OTPRefresh, {
-    foreignKey: {
-        name: "userId"
-    },
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE"
-});
 
 export default User;

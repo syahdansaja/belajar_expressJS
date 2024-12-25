@@ -49,10 +49,5 @@ OTPRefresh.init({
         }
     }
 });
-// Relation define
-OTPRefresh.belongsTo(User, {
-    foreignKey: {
-        name: "userId"
-    }
-})
+
 export default OTPRefresh;

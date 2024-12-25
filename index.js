@@ -9,6 +9,9 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import multer from "multer";
 import scheduler from "./tasks/indexScheduler.js";
+import {defineAssociations} from "./Models/index.js";
+
+defineAssociations();
 
 scheduler;
 
