@@ -69,7 +69,7 @@ class RegisterController {
                 });
 
                 if (isUserExist) {
-                    res.status(409).json({
+                    return res.status(409).json({
                         statusCode: 409,
                         error: "User already exists",
                         userExist: {
@@ -113,13 +113,13 @@ class RegisterController {
                 }
                 const resultSendEmail = await sendEmail(mailOptions);
                 if (!resultSendEmail) {
-                    res.status(500).json({
+                    return res.status(500).json({
                         statusCode: 500,
                         error: "Failed to send email",
                     })
                 }
 
-                res.status(201).json({
+                return res.status(201).json({
                     statusCode: 201,
                     message: "Register successfully, OTP verification sent to your email",
                     data: {
@@ -131,7 +131,7 @@ class RegisterController {
                     }
                 });
             } catch (dbError) {
-                res.status(500).json({
+                return res.status(500).json({
                     statusCode: 500,
                     error: "database error",
                     errorMessage: dbError.message,
